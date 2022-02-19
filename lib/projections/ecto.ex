@@ -279,6 +279,10 @@ defmodule Commanded.Projections.Ecto do
       def handle(unquote(event) = event, metadata) do
         update_projection(event, metadata, unquote(lambda))
       end
+
+      def unsafe_handle(unquote(event) = event, metadata) do
+        unsafe_update_projection(event, metadata, unquote(lambda))
+      end
     end
   end
 

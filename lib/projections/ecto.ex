@@ -105,6 +105,27 @@ defmodule Commanded.Projections.Ecto do
         end
       end
 
+      def unsafe_update_projection(event, metadata, multi_fn) do
+        projection_name = Map.fetch!(metadata, :handler_name)
+        event_number = Map.fetch!(metadata, :event_number)
+
+        prefix = schema_prefix(event, metadata)
+
+        multi = Ecto.Multi.new()
+
+        with %Ecto.Multi{} = multi <- apply(multi_fn, [multi]),
+             {:ok, changes} <- transaction(multi) do
+          if function_exported?(__MODULE__, :after_update, 3) do
+            apply(__MODULE__, :after_update, [event, metadata, changes])
+          else
+            :ok
+          end
+        else
+          {:error, _stage, error, _changes} -> {:error, error}
+          {:error, _error} = reply -> reply
+        end
+      end
+
       defp transaction(%Ecto.Multi{} = multi) do
         @repo.transaction(multi, timeout: @timeout, pool_timeout: @timeout)
       end

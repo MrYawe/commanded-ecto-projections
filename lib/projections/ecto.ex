@@ -126,8 +126,6 @@ defmodule Commanded.Projections.Ecto do
         end
       end
 
-      def unsafe_handle(_event, _metadata), do: :ok
-
       defp transaction(%Ecto.Multi{} = multi) do
         @repo.transaction(multi, timeout: @timeout, pool_timeout: @timeout)
       end
@@ -135,6 +133,14 @@ defmodule Commanded.Projections.Ecto do
       defoverridable schema_prefix: 1, schema_prefix: 2
     end
   end
+
+  defmacro __before_compile__(_env) do
+    quote generated: true do
+      @doc false
+      def unsafe_handle(_event, _metadata), do: :ok
+    end
+  end
+
 
   ## User callbacks
 

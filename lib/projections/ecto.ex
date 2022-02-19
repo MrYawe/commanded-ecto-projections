@@ -126,6 +126,8 @@ defmodule Commanded.Projections.Ecto do
         end
       end
 
+      def unsafe_handle(_event, _metadata), do: :ok
+
       defp transaction(%Ecto.Multi{} = multi) do
         @repo.transaction(multi, timeout: @timeout, pool_timeout: @timeout)
       end
@@ -283,8 +285,7 @@ defmodule Commanded.Projections.Ecto do
       def unsafe_handle(unquote(event) = event, metadata) do
         unsafe_update_projection(event, metadata, unquote(lambda))
       end
-
-      def unsafe_handle(_event, _metadata), do: :ok
+    end
   end
 
   defmacro project(event, metadata, do: block) do

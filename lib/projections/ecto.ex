@@ -134,13 +134,6 @@ defmodule Commanded.Projections.Ecto do
     end
   end
 
-  defmacro __before_compile__(_env) do
-    quote generated: true do
-      @doc false
-      def unsafe_handle(_event, _metadata), do: :ok
-    end
-  end
-
 
   ## User callbacks
 
@@ -329,6 +322,13 @@ defmodule Commanded.Projections.Ecto do
       def handle(unquote(event) = event, unquote(metadata) = metadata) do
         update_projection(event, metadata, unquote(lambda))
       end
+    end
+  end
+
+  defmacro __before_compile__(_env) do
+    quote generated: true do
+      @doc false
+      def unsafe_handle(_event, _metadata), do: :ok
     end
   end
 end
